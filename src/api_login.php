@@ -1,49 +1,46 @@
 <?php
-
+// api_login.php
 session_start();
-
-ob_clean(); 
 header('Content-Type: application/json');
+require 'db.php';
 
-require 'db.php'; 
+$data = json_decode(file_get_contents('php://input'), true);
 
-//achei fácil
-$input = file_get_contents('php://input');
-$data = json_decode($input, true);
-
-$email = $data['email'] ?? '';
-$senha = $data['senha'] ?? '';
-
-if (empty($email) || empty($senha)) {
-    echo json_encode(['success' => false, 'message' => 'Preencha todos os campos.']);
+if (!$data || empty($data['email']) || empty($data['senha'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Preencha e-mail e senha.']);
     exit;
 }
 
 try {
-    
-    $stmt = $pdo->prepare("SELECT id, nome, senha_hash, tipo_usuario FROM usuarios WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+   
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+    $stmt->execute([$data['email']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     
-    if ($user && $senha === $user['senha_hash']) {
+    if ($user && password_verify($data['senha'], $user['senha'])) {
         
+       
         $_SESSION['usuario_id'] = $user['id'];
-        $_SESSION['usuario_nome'] = $user['nome'];
+        $_SESSION['nome'] = $user['nome'];
         $_SESSION['tipo_usuario'] = $user['tipo_usuario'];
 
-        $redirectUrl = ($user['tipo_usuario'] === 'admin') ? 'admin.html' : 'catalogo.html';
+       
+        $redirect = ($user['tipo_usuario'] === 'admin') ? 'admin.html' : 'catalogo.html';
 
         echo json_encode([
             'success' => true, 
-            'message' => 'Login realizado!',
-            'redirect' => $redirectUrl
+            'redirect' => $redirect
         ]);
+
     } else {
+        
         echo json_encode(['success' => false, 'message' => 'E-mail ou senha incorretos.']);
     }
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Erro no servidor: ' . $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Erro interno no servidor.']);
 }
 ?>

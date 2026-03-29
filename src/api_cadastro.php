@@ -1,67 +1,62 @@
 <?php
-
+// api_cadastro.php
 session_start();
 header('Content-Type: application/json');
 require 'db.php';
 
+$data = json_decode(file_get_contents('php://input'), true);
 
-$input = file_get_contents('php://input');
-$data = json_decode($input, true);
-
-
-if (!$data) {
-    echo json_encode(['success' => false, 'message' => 'Nenhum dado recebido.']);
-    exit;
-}
-
-$nome = trim($data['nome']);
-$email = trim($data['email']);
-$senha = $data['senha']; // Senha Texto em texto 
-$cpf = $data['cpf'];
-$telefone = $data['telefone'];
-$endereco = $data['endereco'];
-$referencia = $data['referencia'];
-$frequencia = $data['frequencia'];
-
-
-if (empty($email) || empty($senha) || empty($cpf) || empty($frequencia)) {
-    echo json_encode(['success' => false, 'message' => 'Preencha os campos obrigatórios.']);
+if (!$data || empty($data['nome']) || empty($data['email']) || empty($data['senha'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Dados incompletos.']);
     exit;
 }
 
 try {
-    $pdo->beginTransaction();
-
     
-    $stmtCheck = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
-    $stmtCheck->execute([$email]);
-    if ($stmtCheck->rowCount() > 0) {
-        throw new Exception("Este e-mail já está cadastrado.");
+    $checkEmail = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
+    $checkEmail->execute([$data['email']]);
+    if ($checkEmail->rowCount() > 0) {
+        echo json_encode(['success' => false, 'message' => 'Este e-mail já está cadastrado.']);
+        exit;
     }
 
-    // eu apenas desisti de usar hash porque passei 1 hora tentando arrumar bugs e nada funcionava
-    $sqlUser = "INSERT INTO usuarios (nome, email, senha_hash, cpf, telefone, endereco, ponto_referencia, tipo_usuario) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'cliente')";
     
+    $senha_criptografada = password_hash($data['senha'], PASSWORD_DEFAULT);
+
+    $pdo->beginTransaction();
+
+   
+    $sqlUser = "INSERT INTO usuarios (nome, email, senha, telefone, endereco, ponto_referencia, tipo_usuario) 
+                VALUES (?, ?, ?, ?, ?, ?, 'cliente')";
     $stmtUser = $pdo->prepare($sqlUser);
-    
-    
-    $stmtUser->execute([$nome, $email, $senha, $cpf, $telefone, $endereco, $referencia]);
-    
+    $stmtUser->execute([
+        $data['nome'], 
+        $data['email'], 
+        $senha_criptografada, 
+        $data['telefone'], 
+        $data['endereco'], 
+        $data['referencia'] ?? null
+    ]);
+
     $usuario_id = $pdo->lastInsertId();
 
-    
-    $sqlAssinatura = "INSERT INTO assinaturas (usuario_id, frequencia, status) VALUES (?, ?, 'Ativa')";
-    $stmtAss = $pdo->prepare($sqlAssinatura);
-    $stmtAss->execute([$usuario_id, $frequencia]);
+   
+    if (!empty($data['frequencia'])) {
+        $sqlAssinatura = "INSERT INTO assinaturas (usuario_id, frequencia, status) VALUES (?, ?, 'Ativa')";
+        $stmtAssinatura = $pdo->prepare($sqlAssinatura);
+        $stmtAssinatura->execute([$usuario_id, $data['frequencia']]);
+    }
 
     $pdo->commit();
 
     echo json_encode(['success' => true, 'message' => 'Cadastro realizado com sucesso!']);
 
 } catch (Exception $e) {
-    $pdo->rollBack();
-    
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar: ' . $e->getMessage()]);
 }
 ?>
