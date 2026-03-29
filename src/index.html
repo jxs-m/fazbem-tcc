@@ -10,6 +10,7 @@
             --green-light: #dcfce7;
             --text-dark: #1f2937;
             --bg-color: #f8fafc;
+            --white: #ffffff;
         }
 
         body {
@@ -20,7 +21,7 @@
             line-height: 1.6;
         }
 
-        
+        /* --- HEADER --- */
         header {
             padding: 20px 40px;
             display: flex;
@@ -28,6 +29,7 @@
             align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+            background: var(--bg-color);
         }
 
         .brand {
@@ -40,18 +42,27 @@
             gap: 8px;
         }
 
-        .nav-btn {
-            text-decoration: none;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-left: 20px;
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: var(--green-primary); }
 
         .btn-login {
             border: 1px solid var(--green-primary);
-            padding: 8px 20px;
+            padding: 8px 24px;
             border-radius: 20px;
             color: var(--green-primary);
+            text-decoration: none;
+            font-weight: 600;
             transition: 0.2s;
         }
 
@@ -60,24 +71,35 @@
             color: white;
         }
 
-        
+        /* --- HERO SECTION --- */
         .hero {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             max-width: 800px;
             margin: 0 auto;
         }
 
         .hero h1 {
             font-size: 48px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             color: #111827;
+            line-height: 1.1;
         }
 
         .hero p {
             font-size: 18px;
             color: #4b5563;
             margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .cta-button {
@@ -90,7 +112,7 @@
             border-radius: 30px;
             text-decoration: none;
             box-shadow: 0 4px 6px rgba(43, 138, 62, 0.3);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
         }
 
         .cta-button:hover {
@@ -98,7 +120,24 @@
             background-color: #15803d;
         }
 
-        
+        .cta-outline {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--green-primary);
+            border: 2px solid var(--green-primary);
+            font-size: 18px;
+            font-weight: bold;
+            padding: 13px 40px; /* Ajuste para compensar a borda */
+            border-radius: 30px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .cta-outline:hover {
+            background-color: var(--green-light);
+        }
+
+        /* --- COMO FUNCIONA --- */
         .steps-section {
             background: white;
             padding: 80px 20px;
@@ -133,14 +172,16 @@
         .step-card h3 {
             margin-bottom: 10px;
             font-size: 20px;
+            color: #1f2937;
         }
 
         .step-card p {
             color: #666;
             font-size: 15px;
+            line-height: 1.5;
         }
 
-        
+        /* --- FOOTER --- */
         footer {
             background: #1f2937;
             color: white;
@@ -152,6 +193,8 @@
         @media (max-width: 600px) {
             .hero h1 { font-size: 32px; }
             header { padding: 20px; }
+            .cta-group { flex-direction: column; }
+            .cta-button, .cta-outline { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -160,17 +203,22 @@
     <header>
         <a href="index.html" class="brand"><span>🌿</span> Faz Bem</a>
         <nav>
-            <a href="login.html" class="nav-btn btn-login">Fazer Login</a>
+            <a href="vitrine.html" class="nav-link">Produtos</a>
+            <a href="login.html" class="btn-login">Entrar</a>
         </nav>
     </header>
 
     <section class="hero">
         <h1>Saúde e frescor direto da horta para sua mesa</h1>
         <p>
-            Participe do nosso clube de assinatura de orgânicos. 
-            Personalize sua cesta semanal ou quinzenal e receba alimentos selecionados com carinho.
+            Participe do nosso clube de assinatura. 
+            Personalize sua cesta e receba alimentos orgânicos selecionados com carinho, do produtor para sua casa.
         </p>
-        <a href="criar-conta.html" class="cta-button">Começar Assinatura</a>
+        
+        <div class="cta-group">
+            <a href="cadastro.html" class="cta-button">Começar Assinatura</a>
+            <a href="vitrine.html" class="cta-outline">Ver Produtos Disponíveis</a>
+        </div>
     </section>
 
     <section class="steps-section">
@@ -180,7 +228,7 @@
             <div class="step-card">
                 <span class="step-icon">📝</span>
                 <h3>1. Escolha seu Plano</h3>
-                <p>Defina se quer receber sua cesta toda semana, a cada 15 dias ou mensalmente.</p>
+                <p>Defina se quer receber sua cesta <strong>toda semana</strong> ou <strong>a cada 15 dias</strong> (Quinzenal).</p>
             </div>
 
             <div class="step-card">
@@ -192,15 +240,23 @@
             <div class="step-card">
                 <span class="step-icon">🛒</span>
                 <h3>3. Monte a Cesta</h3>
-                <p>Toda semana você recebe nossa sugestão, mas pode adicionar frutas, legumes e verduras extras pelo app.</p>
+                <p>Toda semana você recebe nossa sugestão, mas pode adicionar frutas, legumes e itens extras pelo site.</p>
             </div>
 
             <div class="step-card">
                 <span class="step-icon">🚚</span>
                 <h3>4. Receba em Casa</h3>
-                <p>Nós separamos, embalamos e entregamos na sua porta com total comodidade.</p>
+                <p>Nós separamos, embalamos e entregamos na sua porta com total comodidade e frescor.</p>
             </div>
         </div>
     </section>
 
     <footer>
+        <p>&copy; 2025 Faz Bem. Todos os direitos reservados.</p>
+        <p style="font-size: 14px; color: #9ca3af; margin-top: 10px;">
+            Atendendo Uruguaiana e região.
+        </p>
+    </footer>
+
+</body>
+</html>
