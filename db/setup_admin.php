@@ -1,6 +1,6 @@
 <?php
 
-require 'db.php';
+require '../src/db.php';
 
 $email = "admin@fazbem.com";
 $senha_plana = "admin123"; 
