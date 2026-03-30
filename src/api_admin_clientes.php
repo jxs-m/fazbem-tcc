@@ -15,7 +15,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     if ($method === 'GET') {
         $sql = "SELECT u.id, u.nome, u.email, u.telefone, u.endereco, 
-                       a.frequencia, a.status 
+                       a.frequencia, a.status,
+                       COALESCE((SELECT SUM(valor_total) FROM pedidos WHERE usuario_id = u.id AND status_pagamento != 'Cancelado'), 0) as total_gasto
                 FROM usuarios u
                 LEFT JOIN assinaturas a ON u.id = a.usuario_id
                 WHERE u.tipo_usuario = 'cliente'
