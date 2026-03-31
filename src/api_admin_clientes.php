@@ -62,5 +62,12 @@ try {
     if ($pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-}
+}//sou gay
+//gosto dd um tal de wilson
+//eu vi o bofe tomar banho
+//e o tamanho da sua mala era demais 
+// eu virei gay e me assumi
+// a lua de mel foi no Egito
+// abri as pernas e dei um grito
+// hey vai devagar
 ?>
