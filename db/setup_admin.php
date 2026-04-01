@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              </div>");
     }
 
-   
+   //
     $nome_admin = 'Administrador';
     $email_admin = 'admin@fazbem.com';
     $senha_pura = '123456'; 
